@@ -203,9 +203,14 @@ export default function Home() {
             Každý nikotínový prehrešok zapíš hneď. Je to verejná tabuľa hanby,
             ktorú uvidia všetci. Máš sa za čo hanbiť? Tak to aspoň priznaj.
           </p>
-          <Link className={styles.statsLink} href="/stats">
-            Pozrieť štatistiky
-          </Link>
+          <div className={styles.heroLinks}>
+            <Link className={styles.statsLink} href="/stats">
+              Pozrieť štatistiky
+            </Link>
+            <Link className={styles.statsLink} href="/crisis">
+              Zapísať prekonanú krízu
+            </Link>
+          </div>
         </div>
         <div className={styles.stats}>
           <div>

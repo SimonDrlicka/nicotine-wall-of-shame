@@ -17,6 +17,12 @@ enum ProductType {
   VAPE
 }
 
+enum RewardType {
+  BADGE
+  TREAT
+  STREAK
+}
+
 model Person {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -32,6 +38,21 @@ model Slip {
   amount      Int
   productType ProductType
   createdAt   DateTime    @default(now())
+
+  @@index([personId])
+  @@index([occurredAt])
+}
+
+model Crisis {
+  id           String      @id @default(cuid())
+  personId     String
+  person       Person      @relation(fields: [personId], references: [id])
+  occurredAt   DateTime
+  cravingType  ProductType
+  amount       Int
+  rewardType   RewardType
+  rewardLabel  String
+  createdAt    DateTime    @default(now())
 
   @@index([personId])
   @@index([occurredAt])
