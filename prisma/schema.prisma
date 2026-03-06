@@ -28,6 +28,7 @@ model Person {
   name      String   @unique
   createdAt DateTime @default(now())
   slips     Slip[]
+  crises    Crisis[]
 }
 
 model Slip {
