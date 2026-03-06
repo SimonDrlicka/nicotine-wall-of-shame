@@ -67,7 +67,9 @@ export default function CrisisPage() {
   const [selectedPerson, setSelectedPerson] = useState<string>("");
   const [cravingType, setCravingType] =
     useState<Crisis["cravingType"]>("CIGARETTE");
-  const [amount, setAmount] = useState(20);
+  const [amount, setAmount] = useState(() =>
+    Math.floor(12 + Math.random() * 39)
+  );
   const [occurredAt, setOccurredAt] = useState(getLocalDateTimeValue());
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -108,6 +110,10 @@ export default function CrisisPage() {
   useEffect(() => {
     refresh();
   }, []);
+
+  useEffect(() => {
+    setAmount(Math.floor(12 + Math.random() * 39));
+  }, [cravingType]);
 
   const handleCreateCrisis = async (event: React.FormEvent) => {
     event.preventDefault();
