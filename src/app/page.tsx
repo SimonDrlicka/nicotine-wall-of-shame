@@ -15,26 +15,32 @@ type Slip = {
   personId: string;
   occurredAt: string;
   amount: number;
-  productType: "CIGARETTE" | "CHEW" | "VAPE";
+  productType: "CIGARETTE" | "CIGAR" | "CHEW" | "SHISHA" | "VAPE";
   createdAt: string;
   person: Person;
 };
 
 const productOptions = [
   { value: "CIGARETTE", label: "Cigareta" },
+  { value: "CIGAR", label: "Cigarenka" },
   { value: "CHEW", label: "Žuvačik" },
+  { value: "SHISHA", label: "Šiša" },
   { value: "VAPE", label: "Vapinka" },
 ] as const;
 
 const productUnit: Record<Slip["productType"], string> = {
   CIGARETTE: "cig",
+  CIGAR: "ks",
   CHEW: "ks",
+  SHISHA: "min",
   VAPE: "ťahov",
 };
 
 const productLabel: Record<Slip["productType"], string> = {
   CIGARETTE: "Cigareta",
+  CIGAR: "Cigarenka",
   CHEW: "Žuvačik",
+  SHISHA: "Šiša",
   VAPE: "Vapinka",
 };
 
@@ -64,6 +70,7 @@ export default function Home() {
   const [occurredAt, setOccurredAt] = useState(getLocalDateTimeValue());
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showShamePopup, setShowShamePopup] = useState(false);
 
   const totalCount = useMemo(
     () => slips.reduce((sum, slip) => sum + slip.amount, 0),
@@ -82,14 +89,19 @@ export default function Home() {
       const peopleJson = await peopleRes.json();
       const slipsJson = await slipsRes.json();
 
-      setPeople(peopleJson.people ?? []);
-      setSlips(slipsJson.slips ?? []);
+      const nextPeople = peopleJson.people ?? [];
+      const nextSlips = slipsJson.slips ?? [];
 
-      if (!selectedPerson && peopleJson.people?.length) {
-        setSelectedPerson(peopleJson.people[0].id);
+      setPeople(nextPeople);
+      setSlips(nextSlips);
+
+      if (!selectedPerson && nextPeople.length) {
+        setSelectedPerson(nextPeople[0].id);
       }
+      return { people: nextPeople, slips: nextSlips };
     } catch (err) {
-      setError("Nepodarilo sa nacitat data. Skus to znova.");
+      setError("Nepodarilo sa načítať dáta. Skús to znova.");
+      return { people: [], slips: [] };
     } finally {
       setLoading(false);
     }
@@ -105,7 +117,7 @@ export default function Home() {
     setSuccess(null);
 
     if (personName.trim().length < 2) {
-      setError("Meno musi mat aspon 2 znaky.");
+      setError("Meno musí mať aspoň 2 znaky.");
       return;
     }
 
@@ -118,12 +130,12 @@ export default function Home() {
     const result = await response.json();
 
     if (!response.ok) {
-      setError(result.error ?? "Chyba pri vytvarani mena.");
+      setError(result.error ?? "Chyba pri vytváraní mena.");
       return;
     }
 
     setPersonName("");
-    setSuccess("Clovek pridany do tabule hanby.");
+    setSuccess("Človek pridaný do tabule hanby.");
     await refresh();
   };
 
@@ -133,12 +145,16 @@ export default function Home() {
     setSuccess(null);
 
     if (!selectedPerson) {
-      setError("Vyber cloveka.");
+      setError("Vyber človeka.");
       return;
     }
 
+    const previousCount = slips.filter(
+      (slip) => slip.personId === selectedPerson
+    ).length;
+
     if (!amount || amount <= 0) {
-      setError("Zadaj platny pocet.");
+      setError("Zadaj platný počet.");
       return;
     }
 
@@ -156,14 +172,22 @@ export default function Home() {
     const result = await response.json();
 
     if (!response.ok) {
-      setError(result.error ?? "Chyba pri zazname relapsu.");
+      setError(result.error ?? "Chyba pri zázname relapsu.");
       return;
     }
 
     setAmount(1);
     setOccurredAt(getLocalDateTimeValue());
-    setSuccess("Relaps zapisany.");
-    await refresh();
+    setSuccess("Relaps zapísaný.");
+    const { slips: refreshedSlips } = await refresh();
+
+    const updatedCount = refreshedSlips.filter(
+      (slip: { personId: string }) => slip.personId === selectedPerson
+    ).length;
+
+    if (previousCount === 2 && updatedCount === 3) {
+      setShowShamePopup(true);
+    }
   };
 
   return (
@@ -171,16 +195,16 @@ export default function Home() {
       <header className={styles.hero}>
         <div>
           <p className={styles.kicker}>Wall of Shame</p>
-          <h1>Hanba je zaznam. Zaznam je pravda.</h1>
+          <h1>Hanba je záznam. Záznam je pravda.</h1>
           <p className={styles.subtitle}>
-            Sleduj posmyknutia bez vyhovoriek. Nikotin sem, hanba sem.
+            Sleduj pošmyknutia bez výhovoriek. Nikotín sem, hanba sem.
           </p>
           <p className={styles.description}>
-            Kazdy nikotinovy prehresok zapis hned. Je to verejna tabula hanby,
-            ktoru uvidia vsetci. Mas sa za co hanbit? Tak to aspon priznaj.
+            Každý nikotínový prehrešok zapíš hneď. Je to verejná tabuľa hanby,
+            ktorú uvidia všetci. Máš sa za čo hanbiť? Tak to aspoň priznaj.
           </p>
           <Link className={styles.statsLink} href="/stats">
-            Pozriet statistiky
+            Pozrieť štatistiky
           </Link>
         </div>
         <div className={styles.stats}>
@@ -197,7 +221,7 @@ export default function Home() {
             </strong>
           </div>
           <div>
-            <span className={styles.statLabel}>Ludia</span>
+            <span className={styles.statLabel}>Ľudia</span>
             <strong className={styles.statValue}>
               {countFormatter.format(people.length)}
             </strong>
@@ -207,7 +231,7 @@ export default function Home() {
 
       <section className={styles.forms}>
         <form className={styles.card} onSubmit={handleCreatePerson}>
-          <h2>Pridaj cloveka</h2>
+          <h2>Pridaj človeka</h2>
           <label>
             Meno
             <input
@@ -217,13 +241,13 @@ export default function Home() {
               onChange={(event) => setPersonName(event.target.value)}
             />
           </label>
-          <button type="submit">Pridat do tabule</button>
+          <button type="submit">Pridať do tabule</button>
         </form>
 
         <form className={styles.card} onSubmit={handleCreateSlip}>
           <h2>Zaznamenaj relaps</h2>
           <label>
-            Clovek
+            Človek
             <select
               value={selectedPerson}
               onChange={(event) => setSelectedPerson(event.target.value)}
@@ -252,7 +276,7 @@ export default function Home() {
             </select>
           </label>
           <label>
-            Pocet
+            Počet
             <input
               type="number"
               min={1}
@@ -262,21 +286,21 @@ export default function Home() {
             />
           </label>
           <label>
-            Datum a cas
+            Dátum a čas
             <input
               type="datetime-local"
               value={occurredAt}
               onChange={(event) => setOccurredAt(event.target.value)}
             />
           </label>
-          <button type="submit">Zapisat hanbu</button>
+          <button type="submit">Zapísať hanbu</button>
         </form>
       </section>
 
       <section className={styles.board}>
         <div className={styles.boardHeader}>
-          <h2>Tabula hanby</h2>
-          {loading ? <span>nacitam...</span> : null}
+          <h2>Tabuľa hanby</h2>
+          {loading ? <span>načítam...</span> : null}
         </div>
 
         {error ? <div className={styles.alert}>{error}</div> : null}
@@ -285,7 +309,7 @@ export default function Home() {
         <div className={styles.list}>
           {slips.length === 0 && !loading ? (
             <div className={styles.empty}>
-              Zatial nic. Drz sa, alebo to sem zapis.
+              Zatiaľ nič. Drž sa, alebo to sem zapíš.
             </div>
           ) : null}
           {slips.map((slip) => (
@@ -308,6 +332,32 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {showShamePopup ? (
+        <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
+          <div className={styles.modal}>
+            <div>
+              <h3>Tlsté piče čakajú</h3>
+              <p>
+                Toto už je tvoj tretí záznam. Tvoja hanba je veľká. Tvoje tajomstvo je odhalené. Ľudia ťa vidia takého, aký si, bozkávajúceho sa s tou tlstou pičatlou a už v živote tvoje meno neupadne do zabudnutia. 
+              </p>
+            </div>
+            <div className={styles.modalMedia}>
+              <img
+                src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDF0Ym5lanppeHBjeGJqeHYzNzZ5Zm85ODhobjRhbG1wamUwOHA1ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DDqnnZCKrpF0ctocT9/giphy.gif"
+                alt="Shame gif"
+              />
+            </div>
+            <button
+              type="button"
+              className={styles.modalClose}
+              onClick={() => setShowShamePopup(false)}
+            >
+              Zavrieť
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

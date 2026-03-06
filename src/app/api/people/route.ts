@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   if (!body || typeof body.name !== "string") {
     return NextResponse.json(
-      { error: "Neplatne meno." },
+      { error: "Neplatné meno." },
       { status: 400 }
     );
   }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   if (name.length < 2) {
     return NextResponse.json(
-      { error: "Meno musi mat aspon 2 znaky." },
+      { error: "Meno musí mať aspoň 2 znaky." },
       { status: 400 }
     );
   }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ person }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Toto meno uz existuje." },
+      { error: "Toto meno už existuje." },
       { status: 409 }
     );
   }

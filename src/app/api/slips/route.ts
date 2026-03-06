@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
   if (!body) {
     return NextResponse.json(
-      { error: "Chyba v zadani." },
+      { error: "Chyba v zadaní." },
       { status: 400 }
     );
   }
@@ -32,14 +32,14 @@ export async function POST(request: Request) {
 
   if (!personId || typeof personId !== "string") {
     return NextResponse.json(
-      { error: "Vyber cloveka." },
+      { error: "Vyber človeka." },
       { status: 400 }
     );
   }
 
   if (!productType || !productTypes.has(productType as ProductType)) {
     return NextResponse.json(
-      { error: "Neplatny typ produktu." },
+      { error: "Neplatný typ produktu." },
       { status: 400 }
     );
   }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const parsedAmount = Number(amount);
   if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
     return NextResponse.json(
-      { error: "Zadaj platny pocet." },
+      { error: "Zadaj platný počet." },
       { status: 400 }
     );
   }
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   const dateValue = occurredAt ? new Date(occurredAt) : new Date();
   if (Number.isNaN(dateValue.getTime())) {
     return NextResponse.json(
-      { error: "Neplatny datum." },
+      { error: "Neplatný dátum." },
       { status: 400 }
     );
   }

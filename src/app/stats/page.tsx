@@ -15,14 +15,16 @@ type Slip = {
   personId: string;
   occurredAt: string;
   amount: number;
-  productType: "CIGARETTE" | "CHEW" | "VAPE";
+  productType: "CIGARETTE" | "CIGAR" | "CHEW" | "SHISHA" | "VAPE";
   createdAt: string;
   person: Person;
 };
 
 const productLabel: Record<Slip["productType"], string> = {
   CIGARETTE: "Cigareta",
+  CIGAR: "Cigarenka",
   CHEW: "Žuvačik",
+  SHISHA: "Shisha",
   VAPE: "Vapinka",
 };
 
@@ -60,7 +62,7 @@ export default function StatsPage() {
         setSelectedPerson(peopleJson.people[0].id);
       }
     } catch (err) {
-      setError("Nepodarilo sa nacitat data. Skus to znova.");
+      setError("Nepodarilo sa načítať dáta. Skús to znova.");
     } finally {
       setLoading(false);
     }
@@ -146,19 +148,19 @@ export default function StatsPage() {
       <header className={styles.header}>
         <div>
           <p className={styles.kicker}>Wall of Shame</p>
-          <h1>Statistika relapsov</h1>
+          <h1>Štatistika relapsov</h1>
           <p className={styles.subtitle}>
-            Vyber si cloveka a pozri brutalne cisla.
+            Vyber si človeka a pozri brutálne čísla.
           </p>
         </div>
         <Link className={styles.back} href="/">
-          Spat na tabulu
+          Späť na tabuľu
         </Link>
       </header>
 
       <section className={styles.selector}>
         <label>
-          Clovek
+          Človek
           <select
             value={selectedPerson}
             onChange={(event) => setSelectedPerson(event.target.value)}
@@ -173,19 +175,19 @@ export default function StatsPage() {
         </label>
       </section>
 
-      {loading ? <div className={styles.note}>nacitam...</div> : null}
+      {loading ? <div className={styles.note}>načítam...</div> : null}
       {error ? <div className={styles.alert}>{error}</div> : null}
 
       {!loading && stats && stats.personSlips.length === 0 ? (
         <div className={styles.empty}>
-          Zatial ziadny relaps pre tohto cloveka.
+          Zatiaľ žiadny relaps pre tohto človeka.
         </div>
       ) : null}
 
       {!loading && stats && stats.personSlips.length > 0 ? (
         <section className={styles.grid}>
           <article>
-            <span>Pocet relapsov</span>
+            <span>Počet relapsov</span>
             <strong>{countFormatter.format(stats.totalRelapses)}</strong>
           </article>
           <article>
@@ -193,7 +195,7 @@ export default function StatsPage() {
             <strong>{countFormatter.format(stats.uniqueDays)}</strong>
           </article>
           <article>
-            <span>Najcastejsie</span>
+            <span>Najčastejšie</span>
             <strong>
               {stats.mostCommonProduct
                 ? productLabel[stats.mostCommonProduct]
@@ -205,7 +207,7 @@ export default function StatsPage() {
             <strong>{stats.averagePerRelapse.toFixed(1)}</strong>
           </article>
           <article>
-            <span>Najhorsia noc</span>
+            <span>Najhoršia noc</span>
             <strong>
               {stats.mostIntenseDay
                 ? `${countFormatter.format(stats.mostIntenseDay.amount)} / ${dateFormatter.format(
@@ -215,7 +217,7 @@ export default function StatsPage() {
             </strong>
           </article>
           <article>
-            <span>Posledny relaps</span>
+            <span>Posledný relaps</span>
             <strong>
               {stats.lastRelapseDate
                 ? dateFormatter.format(stats.lastRelapseDate)

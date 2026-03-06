@@ -11,7 +11,9 @@ datasource db {
 
 enum ProductType {
   CIGARETTE
+  CIGAR
   CHEW
+  SHISHA
   VAPE
 }
 
