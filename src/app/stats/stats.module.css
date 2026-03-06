@@ -1,0 +1,127 @@
+.page {
+  min-height: 100vh;
+  padding: 48px clamp(20px, 4vw, 64px) 72px;
+  display: grid;
+  gap: 32px;
+  color: #f7f1ed;
+  background: radial-gradient(1000px 700px at 10% 10%, #2a1013 0%, transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, #1a0c0d 0%, transparent 55%),
+    repeating-linear-gradient(120deg, #120708 0 16px, #15080a 16px 32px),
+    #0b0506;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  font-size: 12px;
+  color: #e1574f;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.header h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.subtitle {
+  max-width: 520px;
+  color: #d8c8c2;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.back {
+  border: 1px solid #3a1a1c;
+  border-radius: 999px;
+  padding: 10px 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  background: rgba(18, 8, 9, 0.9);
+}
+
+.selector {
+  display: grid;
+  max-width: 320px;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  color: #c9a39b;
+}
+
+.selector select {
+  margin-top: 8px;
+  background: #140a0b;
+  border: 1px solid #442225;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #f5e4df;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.grid article {
+  border: 1px solid #3a1a1c;
+  background: rgba(15, 6, 7, 0.85);
+  padding: 20px;
+  border-radius: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.grid span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #9b6a64;
+}
+
+.grid strong {
+  font-size: 22px;
+  color: #f5e4df;
+}
+
+.note,
+.alert,
+.empty {
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.note {
+  background: rgba(18, 9, 10, 0.8);
+  border: 1px solid #3a1a1c;
+  color: #d8c8c2;
+}
+
+.alert {
+  background: rgba(175, 40, 40, 0.2);
+  border: 1px solid rgba(175, 40, 40, 0.4);
+  color: #f0b7b2;
+}
+
+.empty {
+  background: rgba(20, 10, 11, 0.7);
+  border: 1px dashed #3a1a1c;
+  color: #a98680;
+  text-align: center;
+}

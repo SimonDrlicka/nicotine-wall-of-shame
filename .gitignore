@@ -7,6 +7,7 @@
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
+*.db
 !.yarn/releases
 !.yarn/versions
 
