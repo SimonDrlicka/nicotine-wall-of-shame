@@ -48,11 +48,11 @@ const productLabel: Record<Crisis["cravingType"], string> = {
 };
 
 const defaultNotes: Record<Crisis["cravingType"], string> = {
-  CIGARETTE: "Kríza na cigaretu. Telo si pýtalo dym.",
-  CIGAR: "Cigarenková chuť. Chcel som si to ospravedlniť.",
-  CHEW: "Strašne som sa potreboval naložiť.",
-  SHISHA: "Šiša v hlave. Potreboval som ten rituál.",
-  VAPE: "Vapinka volala. Ruky hľadali návyk.",
+  CIGARETTE: "Telo kričalo po dyme. Ruky hľadali cigaretu každou bunkou.",
+  CIGAR: "Krútilo ma to na cigarenku. Hlava si pýtala tvrdý ťah.",
+  CHEW: "Naložiť si nikotín? Vtedy to znelo ako jediná záchrana.",
+  SHISHA: "Šiša v hlave hučala. Potreboval som rituál a ťah po ťahu.",
+  VAPE: "Vapinka ma volala. Prsty už išli samé po device.",
 };
 
 const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
