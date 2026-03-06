@@ -34,3 +34,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Neon migracie
+
+1. Nastav `DATABASE_URL_PROD` na hodnotu `POSTGRES_PRISMA_URL` (Neon/Vercel env).
+2. Lokalne pouzi `DATABASE_URL_DEV` (napr. SQLite `file:./dev.db`).
+3. V produkcii spusti:
+
+```sh
+npm run db:generate
+npm run db:migrate:deploy
+```
+
+Poznamka: migracie pouzivaju non-pooling spojenie, preto `POSTGRES_PRISMA_URL`.

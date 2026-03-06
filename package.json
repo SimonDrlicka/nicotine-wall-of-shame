@@ -5,12 +5,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "prisma": "prisma",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:dev:env": "DATABASE_URL=$DATABASE_URL_DEV prisma migrate dev",
+    "db:migrate:deploy:env": "DATABASE_URL=$DATABASE_URL_PROD prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
