@@ -51,6 +51,7 @@ model Crisis {
   occurredAt   DateTime
   cravingType  ProductType
   amount       Int
+  note         String
   rewardType   RewardType
   rewardLabel  String
   createdAt    DateTime    @default(now())

@@ -16,6 +16,7 @@ type Crisis = {
   occurredAt: string;
   amount: number;
   cravingType: "CIGARETTE" | "CIGAR" | "CHEW" | "SHISHA" | "VAPE";
+  note: string;
   rewardType: "BADGE" | "TREAT" | "STREAK";
   rewardLabel: string;
   createdAt: string;
@@ -46,6 +47,14 @@ const productLabel: Record<Crisis["cravingType"], string> = {
   VAPE: "Vapinka",
 };
 
+const defaultNotes: Record<Crisis["cravingType"], string> = {
+  CIGARETTE: "Kríza na cigaretu. Telo si pýtalo dym.",
+  CIGAR: "Cigarenková chuť. Chcel som si to ospravedlniť.",
+  CHEW: "Strašne som sa potreboval naložiť.",
+  SHISHA: "Šiša v hlave. Potreboval som ten rituál.",
+  VAPE: "Vapinka volala. Ruky hľadali návyk.",
+};
+
 const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
   dateStyle: "medium",
   timeStyle: "short",
@@ -70,14 +79,27 @@ export default function CrisisPage() {
   const [amount, setAmount] = useState(() =>
     Math.floor(12 + Math.random() * 39)
   );
+  const [note, setNote] = useState(defaultNotes.CIGARETTE);
   const [occurredAt, setOccurredAt] = useState(getLocalDateTimeValue());
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const totalCrises = useMemo(
-    () => crises.reduce((sum, crisis) => sum + crisis.amount, 0),
-    [crises]
+  const filteredCrises = useMemo(
+    () =>
+      selectedPerson
+        ? crises.filter((crisis) => crisis.personId === selectedPerson)
+        : [],
+    [crises, selectedPerson]
   );
+
+  const totalCrises = useMemo(
+    () => filteredCrises.reduce((sum, crisis) => sum + crisis.amount, 0),
+    [filteredCrises]
+  );
+
+  const currentReward = filteredCrises.length
+    ? filteredCrises[0].rewardLabel
+    : null;
 
   const refresh = async () => {
     setLoading(true);
@@ -113,6 +135,7 @@ export default function CrisisPage() {
 
   useEffect(() => {
     setAmount(Math.floor(12 + Math.random() * 39));
+    setNote(defaultNotes[cravingType]);
   }, [cravingType]);
 
   const handleCreateCrisis = async (event: React.FormEvent) => {
@@ -138,6 +161,7 @@ export default function CrisisPage() {
         cravingType,
         amount,
         occurredAt,
+        note,
       }),
     });
 
@@ -148,7 +172,8 @@ export default function CrisisPage() {
       return;
     }
 
-    setAmount(20);
+    setAmount(Math.floor(12 + Math.random() * 39));
+    setNote(defaultNotes[cravingType]);
     setOccurredAt(getLocalDateTimeValue());
     setSuccess(`Kríza prekonaná. Odmena: ${result.crisis.rewardLabel}`);
     await refresh();
@@ -172,11 +197,15 @@ export default function CrisisPage() {
       <section className={styles.stats}>
         <div>
           <span>Prekonané krízy</span>
-          <strong>{countFormatter.format(crises.length)}</strong>
+          <strong>{countFormatter.format(filteredCrises.length)}</strong>
         </div>
         <div>
           <span>Odolaté množstvo</span>
           <strong>{countFormatter.format(totalCrises)}</strong>
+        </div>
+        <div>
+          <span>Aktuálna odmena</span>
+          <strong>{currentReward ?? "—"}</strong>
         </div>
       </section>
 
@@ -223,6 +252,14 @@ export default function CrisisPage() {
             />
           </label>
           <label>
+            Poznámka
+            <textarea
+              rows={3}
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+            />
+          </label>
+          <label>
             Dátum a čas
             <input
               type="datetime-local"
@@ -236,11 +273,11 @@ export default function CrisisPage() {
         <div className={styles.rewards}>
           <h3>Odmeny v obehu</h3>
           <ul>
-            <li>Železná vôľa: +1 odolnosť</li>
-            <li>Malá odmena: teplý čaj bez nikotínu</li>
-            <li>Streak boost: jedna kríza bez pádu</li>
-            <li>Čierna známka disciplíny</li>
-            <li>Reward drop: 10 min chill</li>
+            <li>🛡️ Železná vôľa: +1 odolnosť</li>
+            <li>🍵 Malá odmena: teplý čaj bez nikotínu</li>
+            <li>🔥 Streak boost: jedna kríza bez pádu</li>
+            <li>🏴 Čierna známka disciplíny</li>
+            <li>🧘 Reward drop: 10 min chill</li>
           </ul>
         </div>
       </section>
@@ -253,13 +290,29 @@ export default function CrisisPage() {
         <div className={styles.boardHeader}>
           <h2>Prekonané krízy</h2>
         </div>
+        <div className={styles.filterRow}>
+          <label>
+            Filter osoby
+            <select
+              value={selectedPerson}
+              onChange={(event) => setSelectedPerson(event.target.value)}
+            >
+              <option value="">-- vyber --</option>
+              {people.map((person) => (
+                <option key={person.id} value={person.id}>
+                  {person.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className={styles.list}>
-          {crises.length === 0 && !loading ? (
+          {filteredCrises.length === 0 && !loading ? (
             <div className={styles.empty}>
               Zatiaľ nič. Daj si cieľ a splň ho.
             </div>
           ) : null}
-          {crises.map((crisis) => (
+          {filteredCrises.map((crisis) => (
             <article key={crisis.id} className={styles.row}>
               <div>
                 <strong>{crisis.person.name}</strong>
@@ -275,6 +328,7 @@ export default function CrisisPage() {
                   {countFormatter.format(crisis.amount)} {productUnit[crisis.cravingType]}
                 </span>
               </div>
+              <div className={styles.noteLine}>{crisis.note}</div>
               <div className={styles.reward}>
                 <span>Odmena</span>
                 <strong>{crisis.rewardLabel}</strong>

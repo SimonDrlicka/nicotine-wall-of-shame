@@ -5,11 +5,11 @@ import { ProductType, RewardType } from "@prisma/client";
 const productTypes = new Set(Object.values(ProductType));
 
 const rewards: Array<{ type: RewardType; label: string }> = [
-  { type: "BADGE", label: "Železná vôľa: +1 odolnosť" },
-  { type: "TREAT", label: "Malá odmena: teplý čaj bez nikotínu" },
-  { type: "STREAK", label: "Streak boost: jedna kríza bez pádu" },
-  { type: "BADGE", label: "Čierna známka disciplíny" },
-  { type: "TREAT", label: "Reward drop: 10 min chill" },
+  { type: "BADGE", label: "🛡️ Železná vôľa: +1 odolnosť" },
+  { type: "TREAT", label: "🍵 Malá odmena: teplý čaj bez nikotínu" },
+  { type: "STREAK", label: "🔥 Streak boost: jedna kríza bez pádu" },
+  { type: "BADGE", label: "🏴 Čierna známka disciplíny" },
+  { type: "TREAT", label: "🧘 Reward drop: 10 min chill" },
 ];
 
 const pickReward = () => rewards[Math.floor(Math.random() * rewards.length)];
@@ -33,11 +33,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const { personId, cravingType, amount, occurredAt } = body as {
+  const { personId, cravingType, amount, occurredAt, note } = body as {
     personId?: string;
     cravingType?: string;
     amount?: number;
     occurredAt?: string;
+    note?: string;
   };
 
   if (!personId || typeof personId !== "string") {
@@ -71,6 +72,18 @@ export async function POST(request: Request) {
   }
 
   const reward = pickReward();
+  const fallbackNotes: Record<ProductType, string> = {
+    CIGARETTE: "Kríza na cigaretu. Telo si pýtalo dym.",
+    CIGAR: "Cigarenková chuť. Chcel som si to ospravedlniť.",
+    CHEW: "Strašne som sa potreboval naložiť.",
+    SHISHA: "Šiša v hlave. Potreboval som ten rituál.",
+    VAPE: "Vapinka volala. Ruky hľadali návyk.",
+  };
+
+  const finalNote =
+    typeof note === "string" && note.trim().length > 0
+      ? note.trim()
+      : fallbackNotes[cravingType as ProductType];
 
   const crisis = await prisma.crisis.create({
     data: {
@@ -78,6 +91,7 @@ export async function POST(request: Request) {
       cravingType: cravingType as ProductType,
       amount: Math.floor(parsedAmount),
       occurredAt: dateValue,
+      note: finalNote,
       rewardType: reward.type,
       rewardLabel: reward.label,
     },

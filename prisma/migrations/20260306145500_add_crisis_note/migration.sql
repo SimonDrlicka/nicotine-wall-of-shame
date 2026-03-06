@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Crisis" ADD COLUMN "note" TEXT NOT NULL DEFAULT '';
